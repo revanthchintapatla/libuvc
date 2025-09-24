@@ -25,6 +25,9 @@ option(BUILD_EXAMPLE "Build example program" ON)
 option(BUILD_TEST "Build test program" OFF)
 option(ENABLE_UVC_DEBUGGING "Enable UVC debugging" OFF)
 
+set(LIBUVC_PAGE_SIZE "" CACHE STRING
+    "Optional max/common page size (bytes) applied to shared objects; leave empty to disable")
+
 set(libuvc_DESCRIPTION "A cross-platform library for USB video devices")
 set(libuvc_URL "https://github.com/libuvc/libuvc")
 
@@ -140,6 +143,10 @@ foreach(target_name IN LISTS UVC_TARGETS)
             PRIVATE
             ${log-lib}
     )
+  endif()
+  if(LIBUVC_PAGE_SIZE)
+    set_property(TARGET ${target_name} APPEND_STRING PROPERTY LINK_FLAGS
+      " -Wl,-z,max-page-size=${LIBUVC_PAGE_SIZE} -Wl,-z,common-page-size=${LIBUVC_PAGE_SIZE}")
   endif()
 endforeach()
 
